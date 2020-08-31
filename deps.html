@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script>
+    let activeEffect;
+
+    class Dep {
+      constructor(value) {
+        this._value = value
+        this.subscribers = new Set()
+      }
+
+      get value() {
+        this.depend()
+        return this._value
+      }
+      set value(newValue) {
+        this._value = newValue
+        this.notify()
+      }
+
+      depend() {
+        if (activeEffect) {
+          this.subscribers.add(activeEffect)
+        }
+      }
+
+      notify() {
+        this.subscribers.forEach(effect => {
+          effect()
+        })
+      }
+    }
+    function watchEffect(effect) {
+      activeEffect = effect
+      effect()
+      activeEffect = null
+    }
+    const dep = new Dep('hello')
+
+    watchEffect(() => {
+      console.log(dep.value)
+    })
+
+    dep.value = 'new world'
+  </script>
+</head>
+
+<body>
+
+</body>
+
+</html>
